@@ -1,1 +1,1 @@
-ReconhecimentoDigitos
+Projeto da Disciplina de Inteligencia Artificial da UFRPE utilizando a base de dados do MNIST para reconhecimento de digitos de 0 a 9
