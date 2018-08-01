@@ -25,4 +25,8 @@ public class Imagem {
 	public char getLabel() {
 		return this.label;
 	}
+	
+	public String toString() {
+		return label + "";
+	}
 }

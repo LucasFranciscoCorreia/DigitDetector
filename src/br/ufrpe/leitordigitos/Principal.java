@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Principal {
 	public static int atual;
 	static Imagem img[] = new Imagem[60000];
-	static double porcentagem = 0.66;
+	static double porcentagem = 0.75;
 	static Imagem treino[];
 	static Imagem teste[];
-	static int KNN = 5;
-	static int qnt = 300;
+	static int KNN = 3;
+	static int qnt = 100;
 	static int minkowski = 6;
 	static Random rand = new Random();
 	static int tabela[][] = new int[10][10];
@@ -287,7 +288,7 @@ public class Principal {
 			double cont = 0;
 			for(int i = 0; i < 28;i++) {
 				for(int j = 0; j< 28;j++) {
-					cont += Math.pow(referencia[i][j]-teste[i][j],2);
+					cont += Math.pow(Byte.toUnsignedInt(referencia[i][j])-Byte.toUnsignedInt(teste[i][j]),2);
 				}
 			}
 			cont = Math.sqrt(cont);
@@ -309,6 +310,12 @@ public class Principal {
 		}
 		referencias[maiorI] = (long) Math.floor(cont);
 		knn[maiorI] = imagem;
+		maior = referencias[0];
+		for(short i = 1; i < referencias.length;i++) {
+			if(referencias[i] > maior) {
+				maior = referencias[i];
+			}
+		}
 		return maior;
 	}
 
@@ -323,6 +330,12 @@ public class Principal {
 		}
 		referencias[maiorI] = cont;
 		knn01[maiorI] = imagem;
+		maior = referencias[0];
+		for(short i = 1; i < referencias.length;i++) {
+			if(referencias[i] > maior) {
+				maior = referencias[i];
+			}
+		}
 		return maior;
 	}
 
@@ -398,9 +411,11 @@ public class Principal {
 			long cont = 0;
 			for(int i = 0; i < 28;i++) {
 				for(int j = 0; j< 28;j++) {
-					cont += Math.abs(referencia[i][j]-teste[i][j]);
+					cont += Math.abs(Byte.toUnsignedInt(referencia[i][j])-Byte.toUnsignedInt(teste[i][j]));
 				}
 			}
+
+
 			if(cont < maiorDist) {
 				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
