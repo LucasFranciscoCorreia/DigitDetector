@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Principal {
 	public static int atual;
@@ -24,71 +23,16 @@ public class Principal {
 		prepararTreinoETeste();
 		realizarKNNManhattan();
 		realizarKNNEuclidiana();
-		//realizarKNNMinkowski();
-		realizarKNN01Manhattan();
-		realizarKNN01Euclidiana();
-		//realizarKNN01Minkowski();
+		realizarKNNCosseno();
 	}
 
-	private static void realizarKNN01Minkowski() {
-		System.out.println("Iniciando KNN binario com distancia Minkowski: ");
+	private static void realizarKNNCosseno() {
+		System.out.println("Iniciando KNN com distancia Cosseno: ");
 		atual = 0;
 		int testes = teste.length;
 		double tempo = System.currentTimeMillis();
 		for(int i = 0; i < testes;i++) {
-			Imagem vizinhos[] = acharVizinhosMaisProximosMinkowski01(teste[i]);
-			char vizinho = vizinhoMaisProximo(vizinhos);
-			if(teste[i].getLabel() == vizinho) {
-				atual++;
-			}
-			tabela[teste[i].getLabel()-48][vizinho-48]++;
-		}
-		System.out.println(atual +"/"+testes);
-		double dado1 = atual;
-		double dado2 = testes;
-		System.out.println("Sucesso: " + (dado1/dado2)*100.0 + "%");
-		System.out.println("Tempo de teste: " + (System.currentTimeMillis()-tempo)/1000 +"s");
-		System.out.println("Encerrado");
-	}
-
-	private static Imagem[] acharVizinhosMaisProximosMinkowski01(Imagem imagem) {
-		double maiorDist = Double.MAX_VALUE;
-		Imagem knn[] = new Imagem[KNN];
-		double referencias[] = new double[KNN];
-		for(int i = 0; i < KNN;i++) {
-			referencias[i] = Double.MAX_VALUE;
-		}
-		byte referencia[][] = imagem.getImagem();
-		for(int k = 0; k < treino.length;k++) {
-			byte teste[][] = treino[k].getImagem();
-			double cont = 0;
-			for(int i = 0; i < 28;i++) {
-				for(int j = 0; j< 28;j++) {
-					byte a = 0,b = 0;
-					if(referencia[i][j] != 0) {
-						a = 1;
-					}
-					if(teste[i][j] != 0) {
-						b = 1;
-					}
-					cont += Math.pow(Math.abs(a-b),minkowski);
-				}
-			}
-			cont = Math.pow(cont, 1/minkowski);
-			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
-			}
-		}
-		return knn;
-	}
-
-	private static void realizarKNN01Euclidiana() {
-		System.out.println("Iniciando KNN binario com distancia Euclidiana: ");
-		atual = 0;
-		int testes = teste.length;
-		double tempo = System.currentTimeMillis();
-		for(int i = 0; i < testes;i++) {
-			Imagem vizinhos[] = acharVizinhosMaisProximosEuclidiana01(teste[i]);
+			Imagem vizinhos[] = acharVizinhosMaisProximosCosseno(teste[i]);
 			char vizinho = vizinhoMaisProximo(vizinhos);
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
@@ -111,118 +55,7 @@ public class Principal {
 		System.out.println("Encerrado\n");
 	}
 
-	private static Imagem[] acharVizinhosMaisProximosEuclidiana01(Imagem imagem) {
-		long maiorDist = Long.MAX_VALUE;
-		Imagem knn[] = new Imagem[KNN];
-		long referencias[] = new long[KNN];
-		for(int i = 0; i < KNN;i++) {
-			referencias[i] = Long.MAX_VALUE;
-		}
-		byte referencia[][] = imagem.getImagem();
-		for(int k = 0; k < treino.length;k++) {
-			byte teste[][] = treino[k].getImagem();
-			long cont = 0;
-			for(int i = 0; i < 28;i++) {
-				for(int j = 0; j< 28;j++) {
-					byte a = 0,b = 0;
-					if(referencia[i][j] != 0) {
-						a = 1;
-					}
-					if(teste[i][j] != 0) {
-						b = 1;
-					}
-					cont += Math.pow(Math.abs(a-b),2);
-				}
-			}			
-			cont = (long) Math.sqrt(cont);
-			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
-			}
-		}
-		return knn;
-
-	}
-
-	private static void realizarKNN01Manhattan() {
-		System.out.println("Iniciando KNN binario com distancia Manhattan: ");
-		atual = 0;
-		int testes = teste.length;
-		double tempo = System.currentTimeMillis();
-		for(int i = 0; i < testes;i++) {
-			Imagem vizinhos[] = acharVizinhosMaisProximosManhattan01(teste[i]);
-			char vizinho = vizinhoMaisProximo(vizinhos);
-			if(teste[i].getLabel() == vizinho) {
-				atual++;
-			}
-			tabela[teste[i].getLabel()-48][vizinho-48]++;
-		}
-		for(int i = 0 ; i < tabela.length;i++) {
-			System.out.print("\n|\t");
-			for(int j = 0; j < tabela[i].length;j++) {
-				System.out.print(tabela[i][j] + "\t|\t");
-				tabela[i][j] = 0;
-			}
-			System.out.println();
-		}
-		System.out.println(atual +"/"+testes);
-		double dado1 = atual;
-		double dado2 = testes;
-		System.out.println("Sucesso: " + (dado1/dado2)*100.0 + "%");
-		System.out.println("Tempo de teste: " + (System.currentTimeMillis()-tempo)/1000 +"s");
-		System.out.println("Encerrado\n");
-	}
-
-	private static Imagem[] acharVizinhosMaisProximosManhattan01(Imagem imagem) {
-		long maiorDist = Long.MAX_VALUE;
-		Imagem knn[] = new Imagem[KNN];
-		long referencias[] = new long[KNN];
-		for(int i = 0; i < KNN;i++) {
-			referencias[i] = Long.MAX_VALUE;
-		}
-		byte referencia[][] = imagem.getImagem();
-		for(int k = 0; k < treino.length;k++) {
-			byte teste[][] = treino[k].getImagem();
-			long cont = 0;
-			for(int i = 0; i < 28;i++) {
-				for(int j = 0; j< 28;j++) {
-					byte a = 0,b = 0;
-					if(referencia[i][j] != 0) {
-						a = 1;
-					}
-					if(teste[i][j] != 0) {
-						b = 1;
-					}
-					cont += Math.abs(a-b);
-				}
-			}
-			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
-			}
-		}
-		return knn;
-	}
-
-	private static void realizarKNNMinkowski() {
-		System.out.println("Iniciando KNN com distancia Minkowski: ");
-		atual = 0;
-		int testes = teste.length;
-		double tempo = System.currentTimeMillis();
-		for(int i = 0; i < testes;i++) {
-			Imagem vizinhos[] = acharVizinhosMaisProximosMinkowski(teste[i]);
-			char vizinho = vizinhoMaisProximo(vizinhos);
-			if(teste[i].getLabel() == vizinho) {
-				atual++;
-			}
-		}
-		System.out.println(atual +"/"+testes);
-		double dado1 = atual;
-		double dado2 = testes;
-		System.out.println("Sucesso: " + (dado1/dado2)*100.0 + "%");
-		System.out.println("Tempo de teste: " + (System.currentTimeMillis()-tempo)/1000 +"s");
-		System.out.println("Encerrado\n");
-	}
-
-	private static Imagem[] acharVizinhosMaisProximosMinkowski(Imagem imagem) {
+	private static Imagem[] acharVizinhosMaisProximosCosseno(Imagem imagem) {
 		double maiorDist = Double.MAX_VALUE;
 		Imagem knn[] = new Imagem[KNN];
 		double referencias[] = new double[KNN];
@@ -233,12 +66,17 @@ public class Principal {
 		for(int k = 0; k < treino.length;k++) {
 			byte teste[][] = treino[k].getImagem();
 			double cont = 0;
+			double x = 0, y = 0, xy = 0;
 			for(int i = 0; i < 28;i++) {
 				for(int j = 0; j< 28;j++) {
-					cont += Math.pow(Math.abs(referencia[i][j]-teste[i][j]),minkowski);
+					x += (Byte.toUnsignedInt(referencia[i][j])*Byte.toUnsignedInt(referencia[i][j]));
+					y += (Byte.toUnsignedInt(teste[i][j])*(Byte.toUnsignedInt(teste[i][j])));
+					xy += Byte.toUnsignedInt(referencia[i][j])*Byte.toUnsignedInt(teste[i][j]);
 				}
 			}
-			cont = Math.pow(cont, 1/minkowski);
+			x = Math.sqrt(x);
+			y = Math.sqrt(y);
+			cont = xy/(x*y);
 			if(cont < maiorDist) {
 				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
