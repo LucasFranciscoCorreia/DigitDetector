@@ -10,22 +10,23 @@ import java.util.Random;
 public class Principal {
 	public static int atual;
 	static Imagem img[] = new Imagem[60000];
-	static double porcentagem = 0.5;
+	static double porcentagem = 0.66;
 	static Imagem treino[];
 	static Imagem teste[];
-	static int KNN = 4;
-	static int qnt = 130;
-	static int minkowski = 3;
+	static int KNN = 5;
+	static int qnt = 300;
+	static int minkowski = 6;
 	static Random rand = new Random();
+	static int tabela[][] = new int[10][10];
 	public static void main(String[] args) throws IOException {
 		pegarImagensArff();
 		prepararTreinoETeste();
 		realizarKNNManhattan();
 		realizarKNNEuclidiana();
-		realizarKNNMinkowski();
+		//realizarKNNMinkowski();
 		realizarKNN01Manhattan();
 		realizarKNN01Euclidiana();
-		realizarKNN01Minkowski();
+		//realizarKNN01Minkowski();
 	}
 
 	private static void realizarKNN01Minkowski() {
@@ -39,6 +40,7 @@ public class Principal {
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
 			}
+			tabela[teste[i].getLabel()-48][vizinho-48]++;
 		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
@@ -73,7 +75,7 @@ public class Principal {
 			}
 			cont = Math.pow(cont, 1/minkowski);
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -90,6 +92,15 @@ public class Principal {
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
 			}
+			tabela[teste[i].getLabel()-48][vizinho-48]++;
+		}
+		for(int i = 0 ; i < tabela.length;i++) {
+			System.out.print("\n|\t");
+			for(int j = 0; j < tabela[i].length;j++) {
+				System.out.print(tabela[i][j] + "\t|\t");
+				tabela[i][j] = 0;
+			}
+			System.out.println();
 		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
@@ -124,7 +135,7 @@ public class Principal {
 			}			
 			cont = (long) Math.sqrt(cont);
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -142,6 +153,15 @@ public class Principal {
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
 			}
+			tabela[teste[i].getLabel()-48][vizinho-48]++;
+		}
+		for(int i = 0 ; i < tabela.length;i++) {
+			System.out.print("\n|\t");
+			for(int j = 0; j < tabela[i].length;j++) {
+				System.out.print(tabela[i][j] + "\t|\t");
+				tabela[i][j] = 0;
+			}
+			System.out.println();
 		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
@@ -175,7 +195,7 @@ public class Principal {
 				}
 			}
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -219,7 +239,7 @@ public class Principal {
 			}
 			cont = Math.pow(cont, 1/minkowski);
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -236,6 +256,15 @@ public class Principal {
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
 			}
+			tabela[teste[i].getLabel()-48][vizinho-48]++;
+		}
+		for(int i = 0 ; i < tabela.length;i++) {
+			System.out.print("\n|\t");
+			for(int j = 0; j < tabela[i].length;j++) {
+				System.out.print(tabela[i][j] + "\t|\t");
+				tabela[i][j] = 0;
+			}
+			System.out.println();
 		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
@@ -263,7 +292,7 @@ public class Principal {
 			}
 			cont = Math.sqrt(cont);
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -308,6 +337,16 @@ public class Principal {
 			if(teste[i].getLabel() == vizinho) {
 				atual++;
 			}
+			//System.out.print(vizinho + " ");
+			tabela[teste[i].getLabel()-48][vizinho-48]++;
+		}
+		for(int i = 0 ; i < tabela.length;i++) {
+			System.out.print("\n|\t");
+			for(int j = 0; j < tabela[i].length;j++) {
+				System.out.print(tabela[i][j] + "\t|\t");
+				tabela[i][j] = 0;
+			}
+			System.out.println();
 		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
@@ -363,7 +402,7 @@ public class Principal {
 				}
 			}
 			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, imagem, cont);
+				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
@@ -378,7 +417,9 @@ public class Principal {
 		for(int i = 1; i < 60000; i++) {
 			dados.add(img[i]);
 			if(img[i-1].getLabel() != img[i].getLabel() || i == 59999) {
-				dados.remove(dados.size()-1);
+				if(i != 59999) {
+					dados.remove(dados.size()-1);					
+				}
 				prepararDados(treino,teste, dados);
 				dados = new ArrayList<>();
 				dados.add(img[i]);
@@ -397,12 +438,14 @@ public class Principal {
 			int num = rand.nextInt(dados.size());
 			treino.add(dados.get(num));
 			dados.remove(num);
+			Collections.shuffle(dados);
 			cont++;
 		}
 		while(cont < qnt) {
 			int num = rand.nextInt(dados.size());
 			testes.add(dados.get(num));
 			dados.remove(num);
+			Collections.shuffle(dados);
 			cont++;
 		}
 	}
