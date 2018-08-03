@@ -10,12 +10,11 @@ import java.util.Random;
 public class Principal {
 	public static int atual;
 	static Imagem img[] = new Imagem[60000];
-	static double porcentagem = 0.75;
+	static double porcentagem = 0.80;
 	static Imagem treino[];
 	static Imagem teste[];
-	static int KNN = 3;
-	static int qnt = 100;
-	static int minkowski = 6;
+	static int KNN = 6;
+	static int qnt = 1200;
 	static Random rand = new Random();
 	static int tabela[][] = new int[10][10];
 	public static void main(String[] args) throws IOException {
@@ -56,11 +55,11 @@ public class Principal {
 	}
 
 	private static Imagem[] acharVizinhosMaisProximosCosseno(Imagem imagem) {
-		double maiorDist = Double.MAX_VALUE;
+		double menorDist = Double.MIN_VALUE;
 		Imagem knn[] = new Imagem[KNN];
 		double referencias[] = new double[KNN];
 		for(int i = 0; i < KNN;i++) {
-			referencias[i] = Double.MAX_VALUE;
+			referencias[i] = -1;
 		}
 		byte referencia[][] = imagem.getImagem();
 		for(int k = 0; k < treino.length;k++) {
@@ -77,11 +76,31 @@ public class Principal {
 			x = Math.sqrt(x);
 			y = Math.sqrt(y);
 			cont = xy/(x*y);
-			if(cont < maiorDist) {
-				maiorDist = adicionarElemento(knn, referencias, treino[k], cont);
+			if(cont > menorDist) {
+				menorDist = adicionarElementoCos(knn, referencias, treino[k], cont);
 			}
 		}
 		return knn;
+	}
+
+	private static double adicionarElementoCos(Imagem[] knn, double[] referencias, Imagem imagem, double cont) {
+		int menorI = 0;
+		double menor = referencias[0];
+		for(short i = 1; i < referencias.length;i++) {
+			if(referencias[i] < menor) {
+				menor = referencias[i];
+				menorI = i;
+			}
+		}
+		referencias[menorI] = (cont);
+		knn[menorI] = imagem;
+		menor = referencias[0];
+		for(short i = 1; i < referencias.length;i++) {
+			if(referencias[i] < menor) {
+				menor = referencias[i];
+			}
+		}
+		return menor;
 	}
 
 	private static void realizarKNNEuclidiana() {
