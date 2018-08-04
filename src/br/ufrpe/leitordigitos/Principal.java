@@ -1,7 +1,9 @@
 package br.ufrpe.leitordigitos;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,19 +12,38 @@ import java.util.Random;
 public class Principal {
 	public static int atual;
 	static Imagem img[] = new Imagem[60000];
-	static double porcentagem = 0.80;
+	static double porcentagem = 0.66;
 	static Imagem treino[];
 	static Imagem teste[];
-	static int KNN = 6;
-	static int qnt = 1200;
+	static int KNN = 1;
+	static int qnt = 100;
 	static Random rand = new Random();
 	static int tabela[][] = new int[10][10];
+	static String quantidade = "quantidade <- c(";
+	static String percentual = "porcentagem <- c(";
 	public static void main(String[] args) throws IOException {
 		pegarImagensArff();
-		prepararTreinoETeste();
-		realizarKNNManhattan();
-		realizarKNNEuclidiana();
-		realizarKNNCosseno();
+		int i = 0;
+		int j = 0;
+		do {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("grafico.r"));
+			do {
+				System.out.println(j+"-"+i);
+				prepararTreinoETeste();
+				realizarKNNManhattan();
+				//		realizarKNNEuclidiana();
+				//		realizarKNNCosseno();
+			}while(++i < 10);
+			i = 0;
+			qnt+= 100;
+			writer.write(quantidade.substring(0, quantidade.length()-1) + ")");
+			writer.newLine();
+			writer.write(percentual.substring(0, percentual.length()-1) + ")");
+			writer.newLine();
+			writer.write("plot(porcentagem~quantidade)");
+			writer.flush();
+			writer.close();
+		}while(++j < 8);
 	}
 
 	private static void realizarKNNCosseno() {
@@ -208,19 +229,21 @@ public class Principal {
 				atual++;
 			}
 			//System.out.print(vizinho + " ");
-			tabela[teste[i].getLabel()-48][vizinho-48]++;
+			//tabela[teste[i].getLabel()-48][vizinho-48]++;
 		}
-		for(int i = 0 ; i < tabela.length;i++) {
-			System.out.print("\n|\t");
-			for(int j = 0; j < tabela[i].length;j++) {
-				System.out.print(tabela[i][j] + "\t|\t");
-				tabela[i][j] = 0;
-			}
-			System.out.println();
-		}
+		//		for(int i = 0 ; i < tabela.length;i++) {
+		//			System.out.print("\n|\t");
+		//			for(int j = 0; j < tabela[i].length;j++) {
+		//				System.out.print(tabela[i][j] + "\t|\t");
+		//				tabela[i][j] = 0;
+		//			}
+		//			System.out.println();
+		//		}
 		System.out.println(atual +"/"+testes);
 		double dado1 = atual;
 		double dado2 = testes;
+		quantidade += (qnt*10)+",";
+		percentual += (dado1/dado2)*100.0+",";
 		System.out.println("Sucesso: " + (dado1/dado2)*100.0 + "%");
 		System.out.println("Tempo de teste: " + (System.currentTimeMillis()-tempo)/1000 +"s");
 		System.out.println("Encerrado\n");
