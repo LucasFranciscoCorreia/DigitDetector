@@ -38,6 +38,7 @@ class KNNManhattan(imgs: Array<Imagem>, kn: Int, qnt: Int) :KNN(imgs, kn, qnt) {
         return knn.requireNoNulls()
     }
 
+    @Synchronized
     private fun adicionarElemento(knn: Array<Imagem?>, referencias: Array<Long>, imagem: Imagem, cont: Long): Long {
         var maiorI = 0
         var maior = referencias[0]

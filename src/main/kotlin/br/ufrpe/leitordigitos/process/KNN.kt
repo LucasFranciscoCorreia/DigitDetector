@@ -2,18 +2,17 @@ package br.ufrpe.leitordigitos.process
 
 import br.ufrpe.leitordigitos.Imagem
 import br.ufrpe.leitordigitos.Main
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
-abstract class KNN(imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
-    val porcentagem = 0.66
+abstract class KNN(private val imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
+    val porcentagem = 0.90
     lateinit var treino: Array<Imagem>
     lateinit var teste: Array<Imagem>
     var tabela: Array<Array<Int>> = Array(10) { Array(10) {0} }
-    init{
-        prepararTreinoETeste(imgs)
-    }
 
-    private fun prepararTreinoETeste(imgs: Array<Imagem>) {
+    private fun prepararTreinoETeste() {
         println("Preparar casos de treino e teste: ")
         val treino = ArrayList<Imagem>()
         val teste = ArrayList<Imagem>()
@@ -96,7 +95,7 @@ abstract class KNN(imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
         println("Iniciando KNN: ")
         var atual = 0
         val tempo = System.currentTimeMillis().toDouble()
-
+        prepararTreinoETeste()
         for (teste in this.teste) {
             val vizinhos = this.acharVizinhoMaisProximo(teste)
             val vizinho = vizinhoMaisProximo(vizinhos)
@@ -111,7 +110,7 @@ abstract class KNN(imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
         val dado1 = atual.toDouble()
         val dado2 = teste.size.toDouble()
         Main.quantidade += (qnt * 10).toString() + ","
-        Main.percentual += ((dado1 / dado2) * 100.0).toString() + ","
+        Main.percentual += String.format(Locale.US, "%.2f,",(dado1 / dado2) * 100.0)
         println("Sucesso: " + (dado1 / dado2) * 100.0 + "%")
         println("Tempo de teste: " + (System.currentTimeMillis() - tempo) / 1000 + "s")
         println("Encerrado\n")

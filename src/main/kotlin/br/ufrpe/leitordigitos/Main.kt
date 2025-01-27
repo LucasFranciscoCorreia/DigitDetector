@@ -37,9 +37,9 @@ fun main() {
     do {
         do {
             println("$j-$i")
-            val knn: KNN = KNNManhattan(imgs, kn, qnt)
+            //val knn: KNN = KNNManhattan(imgs, kn, qnt)
             //val knn: KNN = KNNEuclidiana(imgs, kn, qnt)
-            //val knn:KNN = KNNCosseno(imgs, kn, qnt)
+            val knn:KNN = KNNCosseno(imgs, kn, qnt)
             knn.start()
         } while (++i < 30)
         i = 0
