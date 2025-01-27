@@ -1,3 +1,5 @@
 package br.ufrpe.leitordigitos
 
-class Imagem(var imagem: Array<ByteArray>, var label: Char)
+import java.io.Serializable
+
+class Imagem(val imagem: Array<Array<Byte>>, val label: Char) : Serializable
