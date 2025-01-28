@@ -47,7 +47,7 @@ java -jar ....jar
 </div>
 
 <h2>Distance Algorithms</h2>
-<p>The following sections describes the distance algorithms used for this projects, being them: <strong>Manhattan Distance</strong>, <strong>Euclidean Distance</strong> and <strong>Cosine similarity</strong></p>
+<p>The following sections describes the distance algorithms used for this projects, being them: <strong>Manhattan Distance</strong>, <strong>Euclidean Distance</strong> and <strong>Cosine Similarity</strong></p>
 
 <h3>Manhattan Distance</h3>
 
@@ -73,9 +73,27 @@ java -jar ....jar
 
 <p>The following content has as objetive demonstrate the validation and comparison between all the 3 distance algorithms. </p>
 
-<p>In this project, we have a database of 60.000 handwritten images, 6.000 for each digit. The database was originally in a 100MB+ .arff file, but were compressed and serialized in a 17MB .bin file in order to be pushed to Github</p>
+<p>In this project, we have a database of 60.000 handwritten images, with about 5.500~6.500 images for each digit. The database was originally in a 100MB+ .arff file, but were compressed and serialized in a 17MB .bin file in order to be pushed to Github</p>
 
 <p>In order to find the optimal solution, we ran this validation 10 times, were each time we picked 100 more than the last iteration (100 for the first iteration, 200 for the second iteration, 300 for the third iteration, etc). Each iteration has their data collected 30 times to find an average value.</p>
+
+<p>The split between train and test for the following validations were 90% to 10% (90% to train and 10% to test)</p>
+
+<h2>Accuracy</h2>
+
+The following graph presents the average accuracy between each measure system, based on the total amount of data for train an test. For example, a 5.000 amount of digits means 4500 digits splits for train an 500 digits splits for test.
+
+<h2>Time</h2>
+
+The following graph presents the average time between each measure system
+
+<h2>Precision</h2>
+
+The following graphs presents the average precision for each digit for each measure. 
+
+<h2>Recall</h2>
+
+The following graphs presents the average precision for each digit for each measure.
 
 <h2>🛡️ License:</h2>
 
