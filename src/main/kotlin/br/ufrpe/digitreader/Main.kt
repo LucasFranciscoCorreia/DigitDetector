@@ -11,9 +11,9 @@ import java.util.zip.GZIPInputStream
 
 class Main {
     companion object {
-        var quantidade: String = "quantidade <- c("
-        var percentual: String = "porcentagem <- c("
-        var tempo: String = "tempo <- c("
+        var quantity: String = "quantidade <- c("
+        var percentage: String = "porcentagem <- c("
+        var time: String = "tempo <- c("
         var precision: Array<String> = arrayOf(
             "precision.0 <- c(",
             "precision.1 <- c(",
@@ -58,7 +58,7 @@ fun main() {
     var i = 0
     var j = 0
     val kn = 5
-    var qnt = 5400
+    var qnt = 100
     do {
         //val knn: KNN = KNNManhattan(imgs, kn, qnt)
         //val knn: KNN = KNNEuclidiana(imgs, kn, qnt)
@@ -70,11 +70,11 @@ fun main() {
         i = 0
         qnt += 100
     } while (++j < 1)
-    writer.write(Main.quantidade.substring(0, Main.quantidade.length - 1) + ")")
+    writer.write(Main.quantity.substring(0, Main.quantity.length - 1) + ")")
     writer.newLine()
-    writer.write(Main.percentual.substring(0, Main.percentual.length - 1) + ")")
+    writer.write(Main.percentage.substring(0, Main.percentage.length - 1) + ")")
     writer.newLine()
-    writer.write(Main.tempo.substring(0, Main.tempo.length - 1) + ")")
+    writer.write(Main.time.substring(0, Main.time.length - 1) + ")")
     writer.newLine()
     Main.precision.forEach{
         writer.write(it.substring(0, it.length-1)+')')

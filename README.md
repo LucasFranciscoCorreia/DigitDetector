@@ -40,10 +40,9 @@ java -jar ....jar
 
 <p>The algorithm choosed to this project was <strong>K Nearest Neighbours</strong> (<strong>KNN</strong>), where, when given an image, we search for <strong>K</strong> images from the database that are the most ressemble the image. After selecting <strong>K</strong> differents images from the database, we look at the digits they contain and then choose the digits that appears the most in the group. For any draw in the digit decision, a random digit between the highest amount of found digits is chosen as the nearest neighbour</p>
 
-<div>
+<div align="center">
 
-![....](...)
-
+<img src="https://raw.githubusercontent.com/LucasFranciscoCorreia/DigitDetector/refs/heads/master/readme/KNN.webp" width="750em">
 </div>
 
 <h2>Distance Algorithms</h2>
@@ -53,9 +52,10 @@ java -jar ....jar
 
 <p>The <strong>Manhattan Distance</strong> is a metric used to determine the distance between 2 points, measuring the shortest as the sum of the absolute difference between the coordinates of the points</p>
 <p>In order to calculate the distance between 2 images as a points, we take each cell of the 28x28 of the image and treat it as if it was a vector with 784 dimensions.</p>
-<div>
 
-![...](...)
+<div align="center">
+
+<img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Manhattam%20Distance.png?raw=true" width="750em">
 
 </div>
 
@@ -65,9 +65,22 @@ java -jar ....jar
 
 <p>As much as the <strong>Manhattan Distance</strong>, the <strong>Euclidean Distance</strong> treats the image as a vector with 784 dimensions to calculate the distance between them.</p>
 
+<div align="center">
+
+<img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Euclidean%20Distance.png?raw=true" width="750em">
+
+</div>
+
 <h3>Cosine Similarity</h3>
 
 <p>Unlike the <strong>Manhattan</strong> and <strong>Euclidean Distance</strong>, the <strong>Cosine Similarity</strong> measures the similarity of 2 vectors, which can also called as the angle between the 2 vectors. The closest the angle is to 0º, the nearest are the vectors. As the cosine function ranges from -1 to 1, and we want the closest images from the angle 0º, we'll seek for the images where the cosine off their angle are the closest to the highest value of the cosine function, 1. </p>
+
+<div align="center">
+
+<img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Cosine%20Similarity.png?raw=true" width="750em">
+<img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Cosine%20Similarity%20Formula.png?raw=true" width="750em">
+
+</div>
 
 <h1>Validation</h1>
 
@@ -83,17 +96,37 @@ java -jar ....jar
 
 The following graph presents the average accuracy between each measure system, based on the total amount of data for train an test. For example, a 5.000 amount of digits means 4500 digits splits for train an 500 digits splits for test.
 
+<div align="center">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Accuracy.png?raw=true" width="1000em">
+</div>
+
 <h2>Time</h2>
 
 The following graph presents the average time between each measure system
+
+<div align="center">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Time.png?raw=true" width="1000em">
+</div>
 
 <h2>Precision</h2>
 
 The following graphs presents the average precision for each digit for each measure. 
 
+<div align="center">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Precision Manhattan.png?raw=true" width="1000em">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Precision Euclidean.png?raw=true" width="1000em">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Precision Cosine.png?raw=true" width="1000em">
+</div>
+
 <h2>Recall</h2>
 
 The following graphs presents the average precision for each digit for each measure.
+
+<div align="center">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Recall Manhattan.png?raw=true" width="1000em">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Recall Euclidean.png?raw=true" width="1000em">
+    <img src="https://github.com/LucasFranciscoCorreia/DigitDetector/blob/master/readme/Recall Cosine.png?raw=true" width="1000em">
+</div>
 
 <h2>🛡️ License:</h2>
 
