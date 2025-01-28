@@ -2,7 +2,6 @@ plugins {
   id 'application'
   id 'org.jetbrains.kotlin.jvm' version '2.1.0'
   id 'org.javamodularity.moduleplugin' version '1.8.15'
-  id 'org.openjfx.javafxplugin' version '0.1.0'
   id 'org.beryx.jlink' version '3.1.1'
 }
 
@@ -18,8 +17,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 application {
-  mainModule = 'br.ufrpe.leitordigitos'
-  mainClass = 'br.ufrpe.leitordigitos.Main'
+  mainModule = "br.ufrpe.digitreader"
+  mainClass = 'br.ufrpe.digitreader.Main'
 }
 
 sourceSets {
@@ -44,11 +43,6 @@ java {
   }
 }
 
-javafx {
-  version = '23.0.1'
-  modules = ['javafx.controls', 'javafx.fxml']
-}
-
 tasks.jar {
   manifest {
     attributes 'Main-Class': application.mainClass
@@ -61,8 +55,5 @@ tasks.jar {
 
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"
-  implementation "org.openjfx:javafx-controls:23"
-  implementation "org.openjfx:javafx-fxml:23"
-  implementation 'io.github.palexdev:materialfx:11.13.6'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1"
 }
