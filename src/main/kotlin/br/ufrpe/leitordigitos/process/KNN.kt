@@ -1,49 +1,51 @@
 package br.ufrpe.leitordigitos.process
 
-import br.ufrpe.leitordigitos.Imagem
+import br.ufrpe.digitreader.Image
 import br.ufrpe.leitordigitos.Main
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
-abstract class KNN(private val imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
-    val porcentagem = 0.90
-    lateinit var treino: Array<Imagem>
-    lateinit var teste: Array<Imagem>
-    var tabela: Array<Array<Int>> = Array(10) { Array(10) {0} }
+abstract class KNN(private val imgs: Array<Image>, val kNeighbors: Int, val quantity: Int) {
+    private val percentage = 0.90
+    var treinos: List<Image> = ArrayList()
+    private val rand = Random(System.currentTimeMillis())
+    private var testes: List<Image> = ArrayList()
+    private var tabela: Array<Array<Int>> = Array(10) { Array(10) {0} }
 
     private fun prepararTreinoETeste() {
         println("Preparar casos de treino e teste: ")
-        val treino = ArrayList<Imagem>()
-        val teste = ArrayList<Imagem>()
-        var dados = ArrayList<Imagem>()
+        val treinoList = ArrayList<Image>()
+        val testeList = ArrayList<Image>()
+        var dados = ArrayList<Image>()
         dados.add(imgs[0])
         for (i in 1..59999) {
             dados.add(imgs[i])
             if (imgs[i - 1].label != imgs[i].label || i == 59999) {
+                println(dados.size)
                 if (i != 59999) {
                     dados.removeAt(dados.size - 1)
                 }
-                prepararDados(treino, teste, dados)
-                dados = ArrayList()
+                prepararDados(treinoList, testeList, dados)
+                dados.clear()
                 dados.add(imgs[i])
             }
         }
-        this.treino = treino.toTypedArray<Imagem>()
-        this.teste = teste.toTypedArray<Imagem>()
+        this.treinos = treinoList
+        this.testes = testeList
         println("Casos de treino e teste prontos\n")
     }
 
-    private fun prepararDados(treino: ArrayList<Imagem>, testes: ArrayList<Imagem>, dados: ArrayList<Imagem>) {
+    private fun prepararDados(treino: ArrayList<Image>, testes: ArrayList<Image>, dados: ArrayList<Image>) {
         var cont = 0
-        val rand = Random(System.currentTimeMillis())
-        while (cont < qnt * porcentagem) {
+        // val rand = Random(System.currentTimeMillis())
+        while (cont < quantity * percentage) {
             val num = rand.nextInt(dados.size)
             treino.add(dados[num])
             dados.removeAt(num)
             cont++
         }
-        while (cont < qnt) {
+        while (cont < quantity) {
             val num = rand.nextInt(dados.size)
             testes.add(dados[num])
             dados.removeAt(num)
@@ -51,52 +53,54 @@ abstract class KNN(private val imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
         }
     }
 
-    private fun vizinhoMaisProximo(vizinhos: Array<Imagem>): Char {
-        val res = Array<Byte>(10) {0}
-        for (i in vizinhos.indices) {
-            res[vizinhos[i].label.code - 48]++
+    private fun vizinhoMaisProximo(vizinhos: Array<Image>): Char {
+        val res = HashMap<Char, Int>()
+        for (vizinho in vizinhos) {
+            res[vizinho.label] = res.getOrDefault(vizinho.label, 0) + 1
         }
-        var maior = 0
-        for (i in 0..9) {
-            if (res[i] > maior) {
-                maior = res[i].toInt()
-            }
-        }
-        var qnt = 0
-        for (i in 0..9) {
-            if (maior == res[i].toInt()) {
-                qnt++
-            }
-        }
+        val maior = res.values.maxOrNull() ?: 0
+        val candidatos = res.filterValues { it == maior }.keys.toList()
         val rand = Random(System.currentTimeMillis())
-        val k = rand.nextInt(qnt)
-        var cont = 0
-        for (i in 0..9) {
-            if (res[i].toInt() == maior && cont < k) {
-                cont++
-            } else if (res[i].toInt() == maior && cont == k) {
-                return (i + 48).toChar()
-            }
-        }
-        return ' '
+        return candidatos[rand.nextInt(candidatos.size)]
     }
 
-    fun start(){
-        fun printTabela(){
-            for (i in tabela.indices) {
-                print("\n|\t")
-                for (j in tabela[i].indices) {
-                    print(tabela[i][j].toString() + "\t|\t")
-                    tabela[i][j] = 0
-                }
-                println()
-            }
+    private fun columnSum(i: Int): Int{
+        var sum = 0
+        for (j in tabela.indices){
+            sum += tabela[j][i]
         }
+        return sum
+    }
+
+    fun start() {
         println("Iniciando KNN: ")
-        var atual = 0
         val tempo = System.currentTimeMillis().toDouble()
+        tabela = Array(10) { Array(10) {0} }
         prepararTreinoETeste()
-        for (teste in this.teste) {
+        val atual = processTestCases()
+        printTabela()
+        println(atual.toString() + "/" + this.testes.size)
+        val dado1 = atual.toDouble()
+        val dado2 = testes.size
+        Main.quantidade += (quantity * 10).toString() + ","
+        Main.percentual += String.format(Locale.US, "%.2f,", (dado1 / dado2) * 100.0)
+        Main.tempo += String.format(Locale.US, "%.2f,", (System.currentTimeMillis().toDouble()-tempo)/1000)
+        println(tabela[0][0])
+        println(tabela[0].sum())
+        Main.precision = Main.precision.mapIndexed{ i, it ->
+            it + String.format(Locale.US, "%.2f,", tabela[i][i].toDouble()/columnSum(i))
+        }.toTypedArray()
+        Main.recall = Main.recall.mapIndexed{ i, it ->
+            it + String.format(Locale.US, "%.2f,", tabela[i][i].toDouble()/tabela[i].sum())
+        }.toTypedArray()
+            println("Sucesso: " + (dado1 / dado2) * 100.0 + "%")
+        println("Tempo de teste: " + (System.currentTimeMillis() - tempo) / 1000 + "s")
+        println("Encerrado\n")
+    }
+
+    private fun processTestCases(): Int {
+        var atual = 0
+        for (teste in this.testes) {
             val vizinhos = this.acharVizinhoMaisProximo(teste)
             val vizinho = vizinhoMaisProximo(vizinhos)
             if (teste.label == vizinho) {
@@ -104,17 +108,18 @@ abstract class KNN(private val imgs: Array<Imagem>, val kn: Int, val qnt: Int) {
             }
             tabela[teste.label.code - 48][vizinho.code - 48]++
         }
-
-        printTabela()
-        println(atual.toString() + "/" + teste.size)
-        val dado1 = atual.toDouble()
-        val dado2 = teste.size.toDouble()
-        Main.quantidade += (qnt * 10).toString() + ","
-        Main.percentual += String.format(Locale.US, "%.2f,",(dado1 / dado2) * 100.0)
-        println("Sucesso: " + (dado1 / dado2) * 100.0 + "%")
-        println("Tempo de teste: " + (System.currentTimeMillis() - tempo) / 1000 + "s")
-        println("Encerrado\n")
+        return atual
     }
 
-    abstract fun acharVizinhoMaisProximo(imagem: Imagem): Array<Imagem>
+    private fun printTabela() {
+        for (i in tabela.indices) {
+            print("\n|\t")
+            for (j in tabela[i].indices) {
+                print(tabela[i][j].toString() + "\t|\t")
+            }
+            println()
+        }
+    }
+
+    abstract fun acharVizinhoMaisProximo(imagem: Image): Array<Image>
 }

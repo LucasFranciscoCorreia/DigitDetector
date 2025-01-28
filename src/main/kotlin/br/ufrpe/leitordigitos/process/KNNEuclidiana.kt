@@ -1,32 +1,27 @@
 package br.ufrpe.leitordigitos.process
 
-import br.ufrpe.leitordigitos.Imagem
+import br.ufrpe.digitreader.Image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.math.abs
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class KNNEuclidiana(imgs: Array<Imagem>, kn: Int, qnt: Int): KNN(imgs, kn, qnt) {
-    override fun acharVizinhoMaisProximo(imagem: Imagem): Array<Imagem> {
-        var maiorDist = Double.MAX_VALUE
-        val knn = arrayOfNulls<Imagem>(kn)
-        val referencias = Array(kn) {Double.MAX_VALUE}
+class KNNEuclidiana(imgs: Array<Image>, kn: Int, qnt: Int): KNN(imgs, kn, qnt) {
+    private val lock = ReentrantLock()
+
+    override fun acharVizinhoMaisProximo(imagem: Image): Array<Image> {
+        val knn: Array<Image?> = arrayOfNulls(super.kNeighbors)
+        val referencias = Array(kNeighbors) { Double.MAX_VALUE }
         runBlocking {
-            treino.toList().chunked(100).forEach { chunck: List<Imagem> ->
+            var maiorDist = Double.MAX_VALUE
+            super.treinos.chunked(100).forEach { chunck: List<Image> ->
                 launch(Dispatchers.Default) {
-                    chunck.forEach { treino: Imagem ->
-                        var cont = 0.0
-                        for (i in 0..27) {
-                            for (j in 0..27) {
-                                cont += (imagem.imagem[i][j].toUByte().toInt() - treino.imagem[i][j].toUByte()
-                                    .toInt()).toDouble().pow(2)
-                            }
-                        }
-                        cont = sqrt(cont)
-                        if (cont < maiorDist) {
-                            maiorDist = adicionarElemento(knn, referencias, treino, cont)
+                    chunck.forEach { treino: Image ->
+                        val cont = calcularDistanciaEuclidiana(imagem, treino)
+                        if(cont < maiorDist){
+                            maiorDist = addElement(knn, referencias, treino, cont)
                         }
                     }
                 }
@@ -34,26 +29,39 @@ class KNNEuclidiana(imgs: Array<Imagem>, kn: Int, qnt: Int): KNN(imgs, kn, qnt) 
         }
         return knn.requireNoNulls()
     }
-    @Synchronized
-    private fun adicionarElemento(knn: Array<Imagem?>, referencias: Array<Double>, imagem: Imagem, cont: Double): Double {
-        var maiorI = 0
-        var maior = referencias[0]
 
-        for (i in 1 until referencias.size) {
-            if (referencias[i] > maior) {
-                maior = referencias[i]
-                maiorI = i
+    private fun calcularDistanciaEuclidiana(imagem: Image, treino: Image): Double {
+        var cont = 0.0
+        for (i in 0..27) {
+            for (j in 0..27) {
+                cont += (imagem.image[i][j].toUByte().toInt() - treino.image[i][j].toUByte().toInt()).toDouble()
+                    .pow(2)
             }
         }
-
-        referencias[maiorI] = cont
-        knn[maiorI] = imagem
-
-        maior = referencias[0]
-        for (i in 1 until referencias.size) {
-            if (referencias[i] > maior) {
-                maior = referencias[i]
+        return sqrt(cont)
+    }
+    private fun addElement(knn: Array<Image?>,referencias: Array<Double>,imagem: Image,cont: Double): Double {
+        lock.lock()
+        var maiorI = 0
+        var maior = referencias[0]
+        try {
+            for (i in 1 until referencias.size) {
+                if (referencias[i] > maior) {
+                    maior = referencias[i]
+                    maiorI = i
+                }
             }
+
+            referencias[maiorI] = cont
+            knn[maiorI] = imagem
+            maior = referencias[0]
+            for (i in 1 until referencias.size) {
+                if (referencias[i] > maior) {
+                    maior = referencias[i]
+                }
+            }
+        } finally {
+            lock.unlock()
         }
 
         return maior

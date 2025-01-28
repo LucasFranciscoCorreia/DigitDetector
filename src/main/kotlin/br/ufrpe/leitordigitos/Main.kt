@@ -1,54 +1,89 @@
 package br.ufrpe.leitordigitos
 
+import br.ufrpe.digitreader.Image
 import br.ufrpe.leitordigitos.process.KNN
 import br.ufrpe.leitordigitos.process.KNNCosseno
 import br.ufrpe.leitordigitos.process.KNNEuclidiana
 import br.ufrpe.leitordigitos.process.KNNManhattan
-import jdk.internal.org.jline.utils.Colors
 import java.io.*
 import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
 
 
 class Main {
     companion object {
         var quantidade: String = "quantidade <- c("
         var percentual: String = "porcentagem <- c("
+        var tempo: String = "tempo <- c("
+        var precision: Array<String> = arrayOf(
+            "precision.0 <- c(",
+            "precision.1 <- c(",
+            "precision.2 <- c(",
+            "precision.3 <- c(",
+            "precision.4 <- c(",
+            "precision.5 <- c(",
+            "precision.6 <- c(",
+            "precision.7 <- c(",
+            "precision.8 <- c(",
+            "precision.9 <- c(",
+        )
+        var recall: Array<String> = arrayOf(
+            "recall.0 <- c(",
+            "recall.1 <- c(",
+            "recall.2 <- c(",
+            "recall.3 <- c(",
+            "recall.4 <- c(",
+            "recall.5 <- c(",
+            "recall.6 <- c(",
+            "recall.7 <- c(",
+            "recall.8 <- c(",
+            "recall.9 <- c(",
+        )
 
-        fun pegarImagens(): Array<Imagem> {
+        fun pegarImagens(): Array<Image> {
             val reader = ObjectInputStream(BufferedInputStream(GZIPInputStream(FileInputStream("src/main/resources/br/ufrpe/leitordigitos/digitos.bin"))))
             println("reading...")
-            val imgs: Array<Imagem> = reader.readObject() as Array<Imagem>
+            val imgs: Array<Image> = reader.readObject() as Array<Image>
             println("read")
             reader.close()
             return imgs
         }
+
     }
 }
 
 
 fun main() {
-    val imgs: Array<Imagem> = Main.pegarImagens()
+    val imgs: Array<Image> = Main.pegarImagens()
     val writer = BufferedWriter(FileWriter("grafico.r"))
     var i = 0
     var j = 0
     val kn = 5
-    var qnt = 100
+    var qnt = 5400
     do {
+        //val knn: KNN = KNNManhattan(imgs, kn, qnt)
+        //val knn: KNN = KNNEuclidiana(imgs, kn, qnt)
+        val knn:KNN = KNNCosseno(imgs, kn, qnt)
         do {
             println("$j-$i")
-            //val knn: KNN = KNNManhattan(imgs, kn, qnt)
-            //val knn: KNN = KNNEuclidiana(imgs, kn, qnt)
-            val knn:KNN = KNNCosseno(imgs, kn, qnt)
             knn.start()
-        } while (++i < 30)
+        } while (++i < 1)
         i = 0
         qnt += 100
-    } while (++j < 10)
+    } while (++j < 1)
     writer.write(Main.quantidade.substring(0, Main.quantidade.length - 1) + ")")
     writer.newLine()
     writer.write(Main.percentual.substring(0, Main.percentual.length - 1) + ")")
     writer.newLine()
+    writer.write(Main.tempo.substring(0, Main.tempo.length - 1) + ")")
+    writer.newLine()
+    Main.precision.forEach{
+        writer.write(it.substring(0, it.length-1)+')')
+        writer.newLine()
+    }
+    Main.recall.forEach{
+        writer.write(it.substring(0, it.length-1)+')')
+        writer.newLine()
+    }
     writer.write("plot(porcentagem~quantidade)")
     writer.flush()
     writer.close()

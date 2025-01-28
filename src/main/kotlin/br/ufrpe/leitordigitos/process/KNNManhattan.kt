@@ -1,27 +1,31 @@
 package br.ufrpe.leitordigitos.process
 
-import br.ufrpe.leitordigitos.Imagem
+import br.ufrpe.digitreader.Image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.abs
 
-class KNNManhattan(imgs: Array<Imagem>, kn: Int, qnt: Int) :KNN(imgs, kn, qnt) {
-    override fun acharVizinhoMaisProximo(imagem: Imagem): Array<Imagem> {
-        var maiorDist = Long.MAX_VALUE
-        val knn = arrayOfNulls<Imagem>(super.kn)
-        val referencias = Array(super.kn) {Long.MAX_VALUE}
+class KNNManhattan(imgs: Array<Image>, kn: Int, qnt: Int) :KNN(imgs, kn, qnt) {
+    private val lock: Lock = ReentrantLock()
+
+    override fun acharVizinhoMaisProximo(imagem: Image): Array<Image> {
+        val knn = arrayOfNulls<Image>(super.kNeighbors)
+        val referencias = Array(super.kNeighbors) {Long.MAX_VALUE}
 
         runBlocking {
-            treino.toList().chunked(100).forEach { chunck: List<Imagem> ->
+            var maiorDist = Long.MAX_VALUE
+            super.treinos.chunked(100).forEach { chunck: List<Image> ->
                 launch (Dispatchers.Default) {
-                    chunck.forEach { treino: Imagem ->
+                    chunck.forEach { treino: Image ->
                         var cont: Long = 0
 
                         for (i in 0 until 28) {
                             for (j in 0 until 28) {
                                 cont += abs(
-                                    (imagem.imagem[i][j].toUByte().toInt() - treino.imagem[i][j].toUByte().toInt())
+                                    (imagem.image[i][j].toUByte().toInt() - treino.image[i][j].toUByte().toInt())
                                 ).toLong()
                             }
                         }
@@ -34,27 +38,33 @@ class KNNManhattan(imgs: Array<Imagem>, kn: Int, qnt: Int) :KNN(imgs, kn, qnt) {
                 }
             }
         }
-
+        if (knn.any { it == null }) {
+            throw IllegalStateException("knn array contains null elements")
+        }
         return knn.requireNoNulls()
     }
 
-    @Synchronized
-    private fun adicionarElemento(knn: Array<Imagem?>, referencias: Array<Long>, imagem: Imagem, cont: Long): Long {
+    private fun adicionarElemento(knn: Array<Image?>, referencias: Array<Long>, imagem: Image, cont: Long): Long {
+        lock.lock()
         var maiorI = 0
         var maior = referencias[0]
-        for (i in 1..<referencias.size) {
-            if (referencias[i] > maior) {
-                maior = referencias[i]
-                maiorI = i
+        try {
+            for (i in 1 until referencias.size) {
+                if (referencias[i] > maior) {
+                    maior = referencias[i]
+                    maiorI = i
+                }
             }
-        }
-        referencias[maiorI] = cont
-        knn[maiorI] = imagem
-        maior = referencias[0]
-        for (i in 1..<referencias.size) {
-            if (referencias[i] > maior) {
-                maior = referencias[i]
+            referencias[maiorI] = cont
+            knn[maiorI] = imagem
+            maior = referencias[0]
+            for (i in 1 until referencias.size) {
+                if (referencias[i] > maior) {
+                    maior = referencias[i]
+                }
             }
+        } finally {
+            lock.unlock()
         }
         return maior
     }
